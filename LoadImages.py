@@ -1,7 +1,5 @@
 # Import the required modules
-import Objects
 import pygame
-import os
 
 # Importing all the sprites
 BIRD_SPRITES = [
