@@ -1,14 +1,15 @@
 # Import the required modules
-import pygame
+from Objects import *
+from typing import Union
 
 
 # Redraws the PyGame window
-def redraw_window(screen: pygame.Surface, background: pygame.Surface, *objects) -> None:
+def redraw_window(screen: pygame.Surface, background: pygame.Surface, *objects: Union[Base, Bird, Pipe]) -> None:
     """
     Redraw the window during every frame
-    :param screen: pygame.Surface
-    :param background: pygame.surface
-    :param objects: List[Any]
+    :param screen: SurfaceType
+    :param background: SurfaceType
+    :param objects: Union[Base, Bird, Pipe]
     :return: None
     """
     pygame.display.update()

@@ -1,5 +1,4 @@
 # Import the required module
-from Objects import *
 from Utilities import *
 
 # PyGame window macros

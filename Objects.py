@@ -1,12 +1,13 @@
 # Import the required modules
-import pygame
 from LoadImages import *
 
 
+# Bird Object
 class Bird:
     pass
 
 
+# Scrolling base object
 class Base:
     def __init__(self, y: int):
         """
@@ -35,12 +36,13 @@ class Base:
     def draw(self, screen: pygame.Surface) -> None:
         """
         Draws the object
-        :param screen: pygame.Surface
+        :param screen: SurfaceType
         :return: None
         """
         screen.blit(BASE_SPRITE, (int(self.first_x), self.y))
         screen.blit(BASE_SPRITE, (int(self.second_x), self.y))
 
 
+# Moving Pipes object
 class Pipe:
     pass
