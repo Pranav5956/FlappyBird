@@ -27,3 +27,9 @@ class ButtonsEnum:
     ScoreButton = 5
     ShareButton = 6
     StartButton = 7
+
+
+# Pipes enum
+class PipesEnum:
+    Bottom = 0
+    Top = 1
