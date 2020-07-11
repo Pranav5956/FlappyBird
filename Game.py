@@ -17,6 +17,7 @@ screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 # Initialize the objects
 base = Base(WIN_HEIGHT - Base.Height)
 pipes = [Pipe(2 * WIN_WIDTH)]   # Initial delay is large
+bird = Bird()
 
 # MainLoop
 while running:
@@ -25,14 +26,18 @@ while running:
 
     # Event handler
     for event in pygame.event.get():
+        # Quit action
         if event.type == pygame.QUIT:
             running = False
+
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            # Make a flap if the user clicks the mouse
+            bird.flap()
 
     # Base handler
     base.move(SCROLL_VEL)
 
     # Pipes handler
-    # Since there is a maximum of only one pipe moving off-screen, it needn't be a list
     crossed_pipe = None
     for pipe in pipes:
         # Remove the pipe if the current pipe has crossed the left border of the screen
@@ -53,7 +58,7 @@ while running:
         pipes.remove(crossed_pipe)
 
     # Animation handler
-    redraw_window(screen, BACKGROUND_SPRITE, base, pipes)
+    redraw_window(screen, BACKGROUND_SPRITE, base, pipes, bird)
 
 # Close the window on exit
 pygame.quit()

@@ -6,7 +6,51 @@ from random import randrange
 
 # Bird Object
 class Bird:
-    pass
+    WIDTH, HEIGHT = BIRD_SPRITES[1].get_size()
+
+    def __init__(self):
+        """
+        Initialize the bird
+        """
+        self.y = (BACKGROUND_SPRITE.get_height() - Base.Height) // 2
+        self.x = BACKGROUND_SPRITE.get_width() // 3
+
+        # Physics controllers
+        self.delta_time = 0.25  # For faster gravity action
+        self.gravity = -9.8
+        self.velocity = 0
+        self.terminal_velocity = -10
+
+    def flap(self) -> None:
+        """
+        Provide a boost flap for the bird
+        :return: None
+        """
+        self.delta_time = 0.25
+        self.velocity = 35
+
+    def move(self) -> None:
+        """
+        Apply physics on the bird
+        :return: None
+        """
+        self.delta_time += 1/30     # FPS is 30 frames per second
+        self.y -= self.velocity * self.delta_time + 0.5 * self.gravity * (self.delta_time ** 2)     # s = ut + 0.5at^2
+        self.velocity = self.velocity + self.gravity * self.delta_time      # v = u + at
+
+        # Limit the velocity to the terminal velocity
+        self.velocity = max(self.terminal_velocity, self.velocity)
+
+        # Limit the y-pos to within the top of the screen and the base
+        self.y = min(max(0, self.y), BACKGROUND_SPRITE.get_height() - Base.Height - Bird.HEIGHT)
+
+    def draw(self, screen: pygame.Surface) -> None:
+        """
+        Draw the bird at (x, y)
+        :param screen: SurfaceType
+        :return: None
+        """
+        screen.blit(BIRD_SPRITES[1], (self.x, self.y))
 
 
 # Scrolling base object
