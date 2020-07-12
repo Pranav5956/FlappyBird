@@ -33,3 +33,11 @@ class ButtonsEnum:
 class PipesEnum:
     Bottom = 0
     Top = 1
+
+
+# Sounds Enum
+class SoundsEnum:
+    Die = 0
+    Hit = 1
+    Point = 2
+    Wing = 3

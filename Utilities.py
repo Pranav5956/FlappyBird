@@ -29,3 +29,24 @@ def redraw_window(screen: pygame.Surface, background: pygame.Surface, base: Base
 
     # Draw the base
     base.draw(screen)
+
+
+def draw_text(screen: pygame.Surface, value: str, pos: Tuple[int, int], big: bool = True) -> None:
+    """
+    Gets a number and prints sprites
+    :param screen: SurfaceType
+    :param value: str
+    :param big: bool = True
+    :param pos: Tuple[ int, int ]
+    :return: None
+    """
+    if big:
+        font = FONT_BIG_SPRITE_SHEET
+        font_rect = FONT_BIG_RECT
+    else:
+        font = FONT_SMALL_SPRITE_SHEET
+        font_rect = FONT_SMALL_RECT
+
+    width, height = font_rect[0].size
+    for i, digit in enumerate(value):
+        screen.blit(font, (pos[0] - (width * len(value)) // 2 + i * width, pos[1] - height // 2), font_rect[int(digit)])

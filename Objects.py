@@ -6,6 +6,89 @@ from random import randrange
 import numpy as np
 
 
+# Scrolling base object
+class Base:
+    Width, Height = BASE_SPRITE.get_size()
+
+    def __init__(self, y: int):
+        """
+        Create a scrolling background base object using 2 images, moving side-by-side
+        :param y: int
+        """
+        self.y = y
+        self.first_x = 0
+        self.second_x = Base.Width
+
+    def move(self, vel: float) -> None:
+        """
+        Move the 2 images and update the position once it has moved out of the screen
+        :param vel: float
+        :return: None
+        """
+        self.first_x -= vel
+        self.second_x -= vel
+
+        if self.first_x <= -Base.Width:
+            self.first_x = self.second_x + Base.Width
+        if self.second_x <= -Base.Width:
+            self.second_x = self.first_x + Base.Width
+
+    def draw(self, screen: pygame.Surface) -> None:
+        """
+        Draws the object
+        :param screen: SurfaceType
+        :return: None
+        """
+        screen.blit(BASE_SPRITE, (int(self.first_x), self.y))
+        screen.blit(BASE_SPRITE, (int(self.second_x), self.y))
+
+
+# Scrolling Pipes object
+class Pipe:
+    Width = PIPE_SPRITES[PipesEnum.Top].get_width()
+    TopPipeHeight = PIPE_SPRITES[PipesEnum.Top].get_height()
+    BottomPipeHeight = PIPE_SPRITES[PipesEnum.Bottom].get_height()
+    Offset = 57
+
+    def __init__(self, x):
+        """
+        Initialize the Pipe object
+        :param x: int
+        """
+        self.x = x
+        self.y = randrange(
+            BACKGROUND_SPRITE.get_height() - Base.Height - Pipe.BottomPipeHeight - Pipe.Offset,
+            Pipe.TopPipeHeight + Pipe.Offset - 22  # 22px accounts for the brim of the bottom pipe
+        )
+        self.can_spawn_next = True
+        self.passed = False
+
+    def move(self, vel: float) -> None:
+        """
+        Move the Pipe by a specified value
+        :param vel: float
+        :return: None
+        """
+        self.x -= vel
+
+    def get_masks(self) -> Tuple[Tuple[pygame.mask.Mask, int], Tuple[pygame.mask.Mask, int]]:
+        """
+        Returns the masks and offsets of the sprites
+        :return: Tuple[ Tuple[ pygame.mask.Mask, int ], Tuple[ pygame.mask.Mask, int ] ]
+        """
+        return (pygame.mask.from_surface(PIPE_SPRITES[PipesEnum.Top]), self.y - Pipe.TopPipeHeight - Pipe.Offset), \
+               (pygame.mask.from_surface(PIPE_SPRITES[PipesEnum.Bottom]), self.y + Pipe.Offset)
+
+    def draw(self, screen: pygame.Surface) -> None:
+        """
+        Draw the Pipes in pairs of two (Top and Bottom)
+        :param screen: SurfaceType
+        :return: None
+        """
+        screen.blit(PIPE_SPRITES[PipesEnum.Bottom], (int(self.x), self.y + Pipe.Offset))
+        screen.blit(PIPE_SPRITES[PipesEnum.Top], (int(self.x), self.y - Pipe.TopPipeHeight - Pipe.Offset))
+
+
 # Bird Object
 class Bird:
     Width, Height = BIRD_SPRITES[1].get_size()
@@ -39,8 +122,8 @@ class Bird:
         Achieved by a time-skip of a quarter of a second
         :return: None
         """
-        self.delta_time = 0.25
-        self.velocity = 35
+        self.delta_time = 0.2
+        self.velocity = 37
 
     def move(self) -> None:
         """
@@ -73,6 +156,25 @@ class Bird:
         rotated_rect = rotated_sprite.get_rect(center=sprite_rect.center)
         return rotated_sprite, rotated_rect
 
+    def _get_mask(self) -> pygame.mask.Mask:
+        """
+        Returns the mask of the sprite
+        :return: pygame.mask.Mask
+        """
+        return pygame.mask.from_surface(self._rotate_image()[0])
+
+    def check_for_collision(self, pipe: Pipe) -> bool:
+        """
+        Checks for collision with a pipe
+        :param pipe: Pipe
+        :return: bool
+        """
+        bird_mask = self._get_mask()
+        for mask, top in pipe.get_masks():
+            if bird_mask.overlap(mask, (round(pipe.x) - self.x, top - int(self.y))):
+                return True
+        return False
+
     def draw(self, screen: pygame.Surface) -> None:
         """
         Draw the bird at (x, y)
@@ -87,83 +189,6 @@ class Bird:
             self.sprite_index = (self.sprite_index + 1) % len(BIRD_SPRITES)
             self.sprite = BIRD_SPRITES[self.sprite_index]
             self.animation_time = self.animation_wait_time
-
+        # Don't animate if falling
         if self.velocity > self.terminal_velocity / 2:
             self.animation_time -= 1
-
-
-# Scrolling base object
-class Base:
-    Width, Height = BASE_SPRITE.get_size()
-
-    def __init__(self, y: int):
-        """
-        Create a scrolling background base object using 2 images, moving side-by-side
-        :param y: int
-        """
-        self.y = y
-        self.first_x = 0
-        self.second_x = Base.Width
-
-    def move(self, vel: float) -> None:
-        """
-        Move the 2 images and update the position once it has moved out of the screen
-        :param vel: float
-        :return: None
-        """
-        self.first_x -= vel
-        self.second_x -= vel
-
-        if self.first_x <= -Base.Width:
-            self.first_x = Base.Width
-        if self.second_x <= -Base.Width:
-            self.second_x = Base.Width
-
-    def draw(self, screen: pygame.Surface) -> None:
-        """
-        Draws the object
-        :param screen: SurfaceType
-        :return: None
-        """
-        screen.blit(BASE_SPRITE, (int(self.first_x), self.y))
-        screen.blit(BASE_SPRITE, (int(self.second_x), self.y))
-
-
-# Scrolling Pipes object
-class Pipe:
-    Width = PIPE_SPRITES[PipesEnum.Top].get_width()
-    TopPipeHeight = PIPE_SPRITES[PipesEnum.Top].get_height()
-    BottomPipeHeight = PIPE_SPRITES[PipesEnum.Bottom].get_height()
-    Offset = 57
-
-    def __init__(self, x):
-        """
-        Initialize the Pipe object
-        :param x: int
-        """
-        self.x = x
-        self.y = randrange(
-            BACKGROUND_SPRITE.get_height() - Base.Height - Pipe.BottomPipeHeight - Pipe.Offset,
-            Pipe.TopPipeHeight + Pipe.Offset - 22  # 22px accounts for the brim of the bottom pipe
-        )
-        self.can_spawn_next = True
-
-    def move(self, vel: float) -> None:
-        """
-        Move the Pipe by a specified value
-        :param vel: float
-        :return: None
-        """
-        self.x -= vel
-
-    def get_mask(self):
-        pass
-
-    def draw(self, screen: pygame.Surface) -> None:
-        """
-        Draw the Pipes in pairs of two (Top and Bottom)
-        :param screen: SurfaceType
-        :return: None
-        """
-        screen.blit(PIPE_SPRITES[PipesEnum.Bottom], (int(self.x), self.y + Pipe.Offset))
-        screen.blit(PIPE_SPRITES[PipesEnum.Top], (int(self.x), self.y - Pipe.TopPipeHeight - Pipe.Offset))

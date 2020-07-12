@@ -51,8 +51,22 @@ BASE_SPRITE = pygame.transform.scale2x(pygame.image.load('Sprites/Backgrounds/Ba
 BACKGROUND_SPRITE = pygame.transform.scale2x(pygame.image.load('Sprites/Backgrounds/Background.png'))
 
 # Fonts
-FONT_BIG = pygame.transform.scale2x(pygame.image.load('Sprites/Fonts/FontBig.png'))
-FONT_SMALL = pygame.transform.scale2x(pygame.image.load('Sprites/Fonts/FontSmall.png'))
+WIN_WIDTH, WIN_HEIGHT = BACKGROUND_SPRITE.get_size()
+pygame.init()
+screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+FONT_BIG_SPRITE_SHEET = pygame.transform.scale2x(pygame.image.load('Fonts/FontBig.png'))
+FONT_SMALL_SPRITE_SHEET = pygame.transform.scale2x(pygame.image.load('Fonts/FontSmall.png'))
+FONT_BIG_RECT = [pygame.Rect(14 * i, 0, 14, 20) for i in range(10)]
+FONT_SMALL_RECT = [pygame.Rect(12 * i, 0, 12, 14) for i in range(10)]
 
 # Icon
 ICON = pygame.image.load('Sprites/FlappyBirdIcon.ico')
+
+# Theme and Sounds
+pygame.mixer.init()
+SOUNDS = [
+    pygame.mixer.Sound('Sounds/sfx_die.wav'),
+    pygame.mixer.Sound('Sounds/sfx_hit.wav'),
+    pygame.mixer.Sound('Sounds/sfx_point.wav'),
+    pygame.mixer.Sound('Sounds/sfx_wing.wav')
+]
