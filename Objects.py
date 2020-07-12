@@ -8,7 +8,7 @@ import numpy as np
 
 # Bird Object
 class Bird:
-    WIDTH, HEIGHT = BIRD_SPRITES[1].get_size()
+    Width, Height = BIRD_SPRITES[1].get_size()
 
     def __init__(self):
         """
@@ -28,7 +28,10 @@ class Bird:
         self.up_angle = 30
         self.down_angle = -90
         self.angle = 0
-        self.sprite = BIRD_SPRITES[1]
+        self.sprite_index = 0
+        self.animation_wait_time = 4
+        self.animation_time = self.animation_wait_time
+        self.sprite = BIRD_SPRITES[self.sprite_index]
 
     def flap(self) -> None:
         """
@@ -52,18 +55,20 @@ class Bird:
         self.velocity = max(self.terminal_velocity, self.velocity)
 
         # Limit the y-pos to within the top of the screen and the base
-        self.y = min(max(0, self.y), BACKGROUND_SPRITE.get_height() - Base.Height - Bird.HEIGHT)
+        self.y = min(max(0, self.y), BACKGROUND_SPRITE.get_height() - Base.Height - Bird.Height)
 
         # Animation
-        # -e^-x graph converges to -90 as x peaks out at 4.5
-        self.angle = -np.exp(self.velocity / (self.terminal_velocity / 4.5)) + (self.velocity > 0) * self.up_angle
+        # -e^-x graph is found suitable for the slow descent
+        # The value of the function converges to -90 as x peaks out at 4.5
+        # The value of the function converges to 0 as x becomes negative
+        self.angle = -np.exp(self.velocity / self.terminal_velocity * 4.5) + (self.velocity > 0) * self.up_angle
 
     def _rotate_image(self) -> Tuple[pygame.Surface, pygame.Rect]:
         """
         Rotates the sprite
         :return: Tuple[ SurfaceType, RectType ]
         """
-        sprite_rect = pygame.Rect(self.x, self.y, self.sprite.get_width(), self.sprite.get_height())
+        sprite_rect = pygame.Rect(self.x, self.y, Bird.Width, Bird.Height)
         rotated_sprite = pygame.transform.rotate(self.sprite, self.angle)
         rotated_rect = rotated_sprite.get_rect(center=sprite_rect.center)
         return rotated_sprite, rotated_rect
@@ -76,6 +81,15 @@ class Bird:
         """
         sprite, rect = self._rotate_image()
         screen.blit(sprite, (rect.x, rect.y))
+
+        # Animation controllers
+        if self.animation_time == 0:
+            self.sprite_index = (self.sprite_index + 1) % len(BIRD_SPRITES)
+            self.sprite = BIRD_SPRITES[self.sprite_index]
+            self.animation_time = self.animation_wait_time
+
+        if self.velocity > self.terminal_velocity / 2:
+            self.animation_time -= 1
 
 
 # Scrolling base object
