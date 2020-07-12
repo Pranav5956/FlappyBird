@@ -1,7 +1,9 @@
 # Import the required modules
 from Enums import *
-from LoadImages import *
+from LoadAssets import *
+from typing import Tuple
 from random import randrange
+import numpy as np
 
 
 # Bird Object
@@ -19,11 +21,19 @@ class Bird:
         self.delta_time = 0.25  # For faster gravity action
         self.gravity = -9.8
         self.velocity = 0
+        self.max_velocity = 35
         self.terminal_velocity = -10
+
+        # Animation controllers
+        self.up_angle = 30
+        self.down_angle = -90
+        self.angle = 0
+        self.sprite = BIRD_SPRITES[1]
 
     def flap(self) -> None:
         """
         Provide a boost flap for the bird
+        Achieved by a time-skip of a quarter of a second
         :return: None
         """
         self.delta_time = 0.25
@@ -34,9 +44,9 @@ class Bird:
         Apply physics on the bird
         :return: None
         """
-        self.delta_time += 1/30     # FPS is 30 frames per second
-        self.y -= self.velocity * self.delta_time + 0.5 * self.gravity * (self.delta_time ** 2)     # s = ut + 0.5at^2
-        self.velocity = self.velocity + self.gravity * self.delta_time      # v = u + at
+        self.delta_time += 1 / 30  # FPS is 30 frames per second
+        self.y -= self.velocity * self.delta_time + 0.5 * self.gravity * (self.delta_time ** 2)  # s = ut + 0.5at^2
+        self.velocity = self.velocity + self.gravity * self.delta_time  # v = u + at
 
         # Limit the velocity to the terminal velocity
         self.velocity = max(self.terminal_velocity, self.velocity)
@@ -44,13 +54,28 @@ class Bird:
         # Limit the y-pos to within the top of the screen and the base
         self.y = min(max(0, self.y), BACKGROUND_SPRITE.get_height() - Base.Height - Bird.HEIGHT)
 
+        # Animation
+        # -e^-x graph converges to -90 as x peaks out at 4.5
+        self.angle = -np.exp(self.velocity / (self.terminal_velocity / 4.5)) + (self.velocity > 0) * self.up_angle
+
+    def _rotate_image(self) -> Tuple[pygame.Surface, pygame.Rect]:
+        """
+        Rotates the sprite
+        :return: Tuple[ SurfaceType, RectType ]
+        """
+        sprite_rect = pygame.Rect(self.x, self.y, self.sprite.get_width(), self.sprite.get_height())
+        rotated_sprite = pygame.transform.rotate(self.sprite, self.angle)
+        rotated_rect = rotated_sprite.get_rect(center=sprite_rect.center)
+        return rotated_sprite, rotated_rect
+
     def draw(self, screen: pygame.Surface) -> None:
         """
         Draw the bird at (x, y)
         :param screen: SurfaceType
         :return: None
         """
-        screen.blit(BIRD_SPRITES[1], (self.x, self.y))
+        sprite, rect = self._rotate_image()
+        screen.blit(sprite, (rect.x, rect.y))
 
 
 # Scrolling base object
@@ -105,7 +130,7 @@ class Pipe:
         self.x = x
         self.y = randrange(
             BACKGROUND_SPRITE.get_height() - Base.Height - Pipe.BottomPipeHeight - Pipe.Offset,
-            Pipe.TopPipeHeight + Pipe.Offset - 22   # 22px accounts for the brim of the bottom pipe
+            Pipe.TopPipeHeight + Pipe.Offset - 22  # 22px accounts for the brim of the bottom pipe
         )
         self.can_spawn_next = True
 
