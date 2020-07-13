@@ -1,7 +1,7 @@
 # Import the required modules
 from Enums import *
 from LoadAssets import *
-from typing import Tuple
+from typing import Tuple, List, Union
 from random import randrange
 import numpy as np
 
@@ -16,8 +16,10 @@ class Base:
         :param y: int
         """
         self.y = y
+        self.x = 0
         self.first_x = 0
         self.second_x = Base.Width
+        self.rect = pygame.Rect(self.x, self.y, Base.Width, Base.Height)
 
     def move(self, vel: float) -> None:
         """
@@ -62,6 +64,8 @@ class Pipe:
         )
         self.can_spawn_next = True
         self.passed = False
+        self.top_pipe_y = self.y - Pipe.TopPipeHeight - Pipe.Offset
+        self.bottom_pipe_y = self.y + Pipe.Offset
 
     def move(self, vel: float) -> None:
         """
@@ -71,13 +75,19 @@ class Pipe:
         """
         self.x -= vel
 
-    def get_masks(self) -> Tuple[Tuple[pygame.mask.Mask, int], Tuple[pygame.mask.Mask, int]]:
+    def get_mask(self) -> Tuple[pygame.mask.Mask, pygame.mask.Mask]:
         """
-        Returns the masks and offsets of the sprites
-        :return: Tuple[ Tuple[ pygame.mask.Mask, int ], Tuple[ pygame.mask.Mask, int ] ]
+        Returns the masks
+        :return: Tuple[ pygame.mask.Mask, pygame.mask.Mask ]
         """
-        return (pygame.mask.from_surface(PIPE_SPRITES[PipesEnum.Top]), self.y - Pipe.TopPipeHeight - Pipe.Offset), \
-               (pygame.mask.from_surface(PIPE_SPRITES[PipesEnum.Bottom]), self.y + Pipe.Offset)
+        return pygame.mask.from_surface(PIPE_SPRITES[PipesEnum.Top]), pygame.mask.from_surface(PIPE_SPRITES[PipesEnum.Bottom])
+
+    def get_tops(self) -> Tuple[int, int]:
+        """
+        Returns the positions
+        :return: Tuple[ int, int ]
+        """
+        return self.top_pipe_y, self.bottom_pipe_y
 
     def draw(self, screen: pygame.Surface) -> None:
         """
@@ -85,8 +95,8 @@ class Pipe:
         :param screen: SurfaceType
         :return: None
         """
-        screen.blit(PIPE_SPRITES[PipesEnum.Bottom], (int(self.x), self.y + Pipe.Offset))
-        screen.blit(PIPE_SPRITES[PipesEnum.Top], (int(self.x), self.y - Pipe.TopPipeHeight - Pipe.Offset))
+        screen.blit(PIPE_SPRITES[PipesEnum.Bottom], (int(self.x), self.bottom_pipe_y))
+        screen.blit(PIPE_SPRITES[PipesEnum.Top], (int(self.x), self.top_pipe_y))
 
 
 # Bird Object
@@ -156,23 +166,28 @@ class Bird:
         rotated_rect = rotated_sprite.get_rect(center=sprite_rect.center)
         return rotated_sprite, rotated_rect
 
-    def _get_mask(self) -> pygame.mask.Mask:
+    def get_mask(self) -> pygame.mask.Mask:
         """
         Returns the mask of the sprite
         :return: pygame.mask.Mask
         """
         return pygame.mask.from_surface(self._rotate_image()[0])
 
-    def check_for_collision(self, pipe: Pipe) -> bool:
+    def check_for_collision(self, obj: Union[Pipe, Base], base: Base) -> bool:
         """
         Checks for collision with a pipe
-        :param pipe: Pipe
+        :param obj: Union[ Pipe, Base ]
+        :param base: Base
         :return: bool
         """
-        bird_mask = self._get_mask()
-        for mask, top in pipe.get_masks():
-            if bird_mask.overlap(mask, (round(pipe.x) - self.x, top - int(self.y))):
+        bird_mask = self.get_mask()
+        for mask, top in zip(obj.get_mask(), obj.get_tops()):
+            if bird_mask.overlap(mask, (round(obj.x) - self.x, top - int(self.y))):
                 return True
+
+        # Collision with ground
+        if self._rotate_image()[1].colliderect(base.rect):
+            return True
         return False
 
     def draw(self, screen: pygame.Surface) -> None:

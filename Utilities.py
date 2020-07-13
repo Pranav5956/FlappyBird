@@ -1,6 +1,5 @@
 # Import the required modules
 from Objects import *
-from typing import List
 
 
 # Redraws the PyGame window

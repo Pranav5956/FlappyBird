@@ -1,5 +1,6 @@
 # Import the required modules
 import pygame
+pygame.init()
 
 # Importing all the sprites
 # Bird
@@ -52,7 +53,6 @@ BACKGROUND_SPRITE = pygame.transform.scale2x(pygame.image.load('Sprites/Backgrou
 
 # Fonts
 WIN_WIDTH, WIN_HEIGHT = BACKGROUND_SPRITE.get_size()
-pygame.init()
 screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 FONT_BIG_SPRITE_SHEET = pygame.transform.scale2x(pygame.image.load('Fonts/FontBig.png'))
 FONT_SMALL_SPRITE_SHEET = pygame.transform.scale2x(pygame.image.load('Fonts/FontSmall.png'))

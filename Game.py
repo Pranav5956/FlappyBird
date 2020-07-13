@@ -7,7 +7,7 @@ CLOCK = pygame.time.Clock()
 SCROLL_VEL = 2.75
 running = True  # Mainloop Handler
 
-# PyGame initialization
+# PyGame display setup
 pygame.display.set_icon(ICON)
 pygame.display.set_caption("Flappy Bird")
 
@@ -65,7 +65,7 @@ while running:
             # Play the point sound
             pygame.mixer.Sound.play(SOUNDS[SoundsEnum.Point])
 
-        if bird.check_for_collision(pipe) and not crashed:
+        if (bird.check_for_collision(pipe, base)) and not crashed:
             # Stop all motion
             crashed = True
             SCROLL_VEL = 0
