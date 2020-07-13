@@ -18,10 +18,10 @@ PIPE_SPRITES = [
 
 # Coins
 COIN_SPRITES = [
-    pygame.transform.scale2x(pygame.image.load('Sprites/Coins/BlankCoin.png')),
     pygame.transform.scale2x(pygame.image.load('Sprites/Coins/BronzeCoin.png')),
     pygame.transform.scale2x(pygame.image.load('Sprites/Coins/SilverCoin.png')),
-    pygame.transform.scale2x(pygame.image.load('Sprites/Coins/GoldCoin.png'))
+    pygame.transform.scale2x(pygame.image.load('Sprites/Coins/GoldCoin.png')),
+    pygame.transform.scale2x(pygame.image.load('Sprites/Coins/PlatinumCoin.png'))
 ]
 
 # Cards
@@ -37,13 +37,7 @@ CARD_SPRITES = [
 
 # Buttons
 BUTTON_SPRITES = [
-    pygame.transform.scale2x(pygame.image.load('Sprites/Buttons/MenuButton.png')),
     pygame.transform.scale2x(pygame.image.load('Sprites/Buttons/OKButton.png')),
-    pygame.transform.scale2x(pygame.image.load('Sprites/Buttons/PauseButton.png')),
-    pygame.transform.scale2x(pygame.image.load('Sprites/Buttons/PlayButton.png')),
-    pygame.transform.scale2x(pygame.image.load('Sprites/Buttons/RateButton.png')),
-    pygame.transform.scale2x(pygame.image.load('Sprites/Buttons/ScoreButton.png')),
-    pygame.transform.scale2x(pygame.image.load('Sprites/Buttons/ShareButton.png')),
     pygame.transform.scale2x(pygame.image.load('Sprites/Buttons/StartButton.png'))
 ]
 

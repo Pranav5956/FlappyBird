@@ -1,9 +1,9 @@
 # Coins enum
 class CoinsEnum:
-    Blank = 0
-    Bronze = 1
-    Silver = 2
-    Gold = 3
+    Bronze = 0
+    Silver = 1
+    Gold = 2
+    Platinum = 3
 
 
 # Cards enum
@@ -19,14 +19,8 @@ class CardsEnum:
 
 # Buttons enum
 class ButtonsEnum:
-    MenuButton = 0
-    OKButton = 1
-    PauseButton = 2
-    PlayButton = 3
-    RateButton = 4
-    ScoreButton = 5
-    ShareButton = 6
-    StartButton = 7
+    OKButton = 0
+    StartButton = 1
 
 
 # Pipes enum
@@ -41,3 +35,12 @@ class SoundsEnum:
     Hit = 1
     Point = 2
     Wing = 3
+
+
+# States Enum
+class StatesEnum:
+    Intro = 0
+    GetReady = 1
+    Play = 2
+    Crashed = 3
+    Score = 4
